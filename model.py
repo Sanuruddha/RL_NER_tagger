@@ -9,7 +9,7 @@ class Learner:  # LOLS algorithm is implemented here
     def __init__(self,
                  length=10,
                  learning_rate=0.001,
-                 n_input=90,
+                 n_input=150,
                  n_classes=2,
                  n_hidden_1=10,
                  n_hidden_2=10):
@@ -86,8 +86,8 @@ class Learner:  # LOLS algorithm is implemented here
         training_data = self.training_data
         training_labels = self.training_labels
         actions = self._actions
-        #for i in range(len(training_data)):
-        for i in range(100):
+        for i in range(len(training_data)):
+        #for i in range(100):
             print("example " + str(i))
             self._induced_tree = self._induce_tree(training_data[i])
             learned_policy = self._generate_learned_policy()
@@ -194,14 +194,14 @@ class Learner:  # LOLS algorithm is implemented here
         X_test = self.testing_data
         Y_test = self.testing_labels
         accuracy = 0.
-        for i in range(10):
+        for i in range(len(X_test)):
             prediction = self.predict_labels(X_test[i])
             correct_count = 0.
             for j in range(len(prediction)):
                 if prediction[j] == Y_test[i][j]:
                     correct_count += 1
             accuracy += (correct_count/len(prediction))
-        accuracy = accuracy/100
+        accuracy = accuracy/len(X_test)
         print("accuracy", accuracy)
 
     def predict_labels(self, sentence):
@@ -324,8 +324,8 @@ class Learner:  # LOLS algorithm is implemented here
             if partial_labels[i] is None:
                 word_index = i
                 break
-        previous_word_vector = [0. for i in range(30)]
-        next_word_vector = [0. for i in range(30)]
+        previous_word_vector = [0. for i in range(50)]
+        next_word_vector = [0. for i in range(50)]
         if word_index > 1:
             previous_word = sentence[word_index-1]
             previous_word_vector = self._get_word_embedding(word2vec_model.wv, previous_word)
@@ -345,4 +345,4 @@ class Learner:  # LOLS algorithm is implemented here
         try:
             return model[word]
         except:
-            return [0. for i in range(30)]
+            return [0. for i in range(50)]

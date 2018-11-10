@@ -27,7 +27,7 @@ for i in lines:
 
 print(lines[0])
 
-model_ted = FastText(lines, size=30, window=5, min_count=5, workers=4, sg=1)
+model_ted = FastText(lines, size=50, window=5, min_count=5, workers=4, sg=1)
 model_ted.save("word2vec.model")
 
 print(model_ted.wv.most_similar(u'\u0dc4\u0dba\u0dd2\u0da7\u0dd2\u0dba'))
