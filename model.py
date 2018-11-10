@@ -172,7 +172,7 @@ class Learner:  # LOLS algorithm is implemented here
         # Initializing the variables
         init = tf.global_variables_initializer()
         # Launch the graph
-        self._tf_session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+        self._tf_session = tf.Session(config=tf.ConfigProto())
         self._tf_session.run(init)
 
     def _train_classifier(self, experience):
