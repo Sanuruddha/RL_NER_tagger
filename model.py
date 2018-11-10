@@ -219,18 +219,11 @@ class Learner:  # LOLS algorithm is implemented here
         return prediction
 
     def predict(self, inp):
-        init = tf.global_variables_initializer()
-        # Launch the graph
-        with tf.Session() as sess:
-            sess.run(init)
-            weights = self._weights_biases['weights']
-            biases = self._weights_biases['biases']
-            self._pred = self._multilayer_perceptron(tf, weights, biases)
-            pred = tf.nn.softmax(self._pred)
-            prediction = tf.argmin(pred, 1)
-            feed_dict = {self._x: [inp]}
-            action = sess.run(prediction, feed_dict)
-            return action
+        pred = tf.nn.softmax(self._pred)
+        prediction = tf.argmin(pred, 1)
+        feed_dict = {self._x: [inp]}
+        action = self._tf_session.run(prediction, feed_dict)
+        return action
 
     def _roll_out(self, policy, policy_type, state, action, induced_tree, labels):
         correct_count = 0.
