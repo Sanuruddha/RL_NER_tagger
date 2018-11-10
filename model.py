@@ -182,13 +182,7 @@ class Learner:  # LOLS algorithm is implemented here
         labels = experience[1]
         labels = np.array([np.array(xi) for xi in labels])
         #labels = np.array(labels, dtype=np.float64)
-        # tf Graph input
-        labels
-        weights = self._weights_biases['weights']
-        biases = self._weights_biases['biases']
 
-        # Construct model
-        self._pred = self._multilayer_perceptron(tf, weights, biases)
         # Run optimization op (backprop) and cost op (to get loss value)
         _, c = self._tf_session.run([self._optimizer, self._cost], feed_dict={self._x: inp,
                                                                               self._y: labels})
