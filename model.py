@@ -34,6 +34,7 @@ class Learner:  # LOLS algorithm is implemented here
         self._tf_session = None
         self._cost = None
         self._optimizer = None
+        self._prediction = None
         self._actions = {'NNE': 0, 'NE': 1}
         self._init_classifier()
 
@@ -168,6 +169,8 @@ class Learner:  # LOLS algorithm is implemented here
         # Define loss and optimizer
         self._cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self._pred, labels=self._y))
         self._optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate).minimize(self._cost)
+        pred = tf.nn.softmax(self._pred)
+        self._prediction = tf.argmin(pred, 1)
 
         # Initializing the variables
         init = tf.global_variables_initializer()
@@ -219,10 +222,8 @@ class Learner:  # LOLS algorithm is implemented here
         return prediction
 
     def predict(self, inp):
-        pred = tf.nn.softmax(self._pred)
-        prediction = tf.argmin(pred, 1)
         feed_dict = {self._x: [inp]}
-        action = self._tf_session.run(prediction, feed_dict)
+        action = self._tf_session.run(self._prediction, feed_dict)
         return action
 
     def _roll_out(self, policy, policy_type, state, action, induced_tree, labels):
