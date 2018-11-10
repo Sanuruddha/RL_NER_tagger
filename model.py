@@ -31,7 +31,9 @@ class Learner:  # LOLS algorithm is implemented here
         self._n_hidden_1 = n_hidden_1
         self._n_hidden_2 = n_hidden_2
         self._pred = None
-        #self._tf_session = None
+        self._tf_session = None
+        self._cost = None
+        self._optimizer = None
         self._actions = {'NNE': 0, 'NE': 1}
         self._init_classifier()
 
@@ -162,15 +164,18 @@ class Learner:  # LOLS algorithm is implemented here
 
         # Construct model
         self._pred = self._multilayer_perceptron(tf, weights, biases)
+
+        # Define loss and optimizer
+        self._cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self._pred, labels=self._y))
+        self._optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate).minimize(self._cost)
+
         # Initializing the variables
-        #init = tf.global_variables_initializer()
+        init = tf.global_variables_initializer()
         # Launch the graph
-        #self._tf_session = tf.Session()
-        #self._tf_session.run(init)
+        self._tf_session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+        self._tf_session.run(init)
 
     def _train_classifier(self, experience):
-        self._x = tf.placeholder("float", [None, self._n_input])
-        self._y = tf.placeholder("float", [None, self._n_classes])
         inp = experience[0]
         inp = np.array([np.array(xi) for xi in inp])
         #inp = np.array(inp, dtype=np.float64)
@@ -184,23 +189,12 @@ class Learner:  # LOLS algorithm is implemented here
 
         # Construct model
         self._pred = self._multilayer_perceptron(tf, weights, biases)
-
-        # Define loss and optimizer
-        cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self._pred, labels=self._y))
-        optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate).minimize(cost)
-        init = tf.global_variables_initializer()
-        # Launch the graph
-        with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
-            sess.run(init)
-            # Training cycle
-            #print(inp)
-            #print(labels)
-            # Run optimization op (backprop) and cost op (to get loss value)
-            _, c = sess.run([optimizer, cost], feed_dict={self._x: inp,
-                                                                      self._y: labels})
-            print("cost=", "{:.9f}".format(c))
-            # Display logs per epoch step
-            print("Optimization Finished!")
+        # Run optimization op (backprop) and cost op (to get loss value)
+        _, c = self._tf_session.run([self._optimizer, self._cost], feed_dict={self._x: inp,
+                                                                              self._y: labels})
+        print("cost=", "{:.9f}".format(c))
+        # Display logs per epoch step
+        print("Optimization Finished!")
 
     def test_classifier(self):
         X_test = self.testing_data
