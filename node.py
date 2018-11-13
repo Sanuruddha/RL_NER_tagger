@@ -5,6 +5,7 @@ class Node:
         self._labels = labels
         self._cost = 0
         self._optimal_action = None
+        self._action_cost = [None, None]
 
     def get_sentence(self):
         return self._sentence
@@ -26,3 +27,11 @@ class Node:
 
     def get_cost(self):
         return self._cost
+
+    def get_action_cost(self, action):
+        if action == 0 or action == 1:
+            return self._action_cost[action]
+
+    def set_action_cost(self, action, cost):
+        if action == 0 or action == 1:
+            self._action_cost[action] = cost

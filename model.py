@@ -107,11 +107,8 @@ class Learner:  # LOLS algorithm is implemented here
                     else:
                         pol = learned_policy
                     action_cost = self._roll_out(pol, choice, s, actions[action], self._induced_tree, training_labels[i])
-                    if action_cost < min_cost:
-                        min_cost = action_cost
                     costs.append(action_cost)
-                for cost_index in range(len(costs)):
-                    costs[cost_index] = costs[cost_index] - min_cost
+
                 feature_vector = self._generate_feature_vector(s)
                 experience.append([feature_vector, costs])
                 s = learned_policy[s]
@@ -227,30 +224,10 @@ class Learner:  # LOLS algorithm is implemented here
         return action
 
     def _roll_out(self, policy, policy_type, state, action, induced_tree, labels):
-        correct_count = 0.
-        if policy_type is 0:
-            state_n = induced_tree.transition(state, action)
-            node_n = induced_tree.get_node(state_n)
-            partial_labels = node_n.get_labels()
-            #print("labels ", labels)
-            #print("partial labels", partial_labels)
-            for i in range(len(partial_labels)):
-                if partial_labels[i] == labels[i]:
-                    correct_count += 1
+        node = induced_tree.get_node(state)
+        cost = node.get_action_cost(action)
+        print(cost)
 
-        elif policy_type is 1:
-            state_n = induced_tree.transition(state, action)
-            while state_n in policy:
-                state_n = policy[state_n]
-
-            node = induced_tree.get_node(state_n)
-            prediction = node.get_labels()
-            #print("labels ", labels)
-            #print("prediction", prediction)
-            for ind in range(len(labels)):
-                if labels[ind] == prediction[ind]:
-                    correct_count += 1
-        cost = (1-correct_count/len(labels))
         return cost
 
     def _induce_tree(self, sentence):
@@ -262,7 +239,7 @@ class Learner:  # LOLS algorithm is implemented here
         return policy
 
     def _generate_node_costs(self, tree, labels):
-        tree_dict = tree.get_dictionary()
+        """tree_dict = tree.get_dictionary()
         for i in tree_dict:
             node = tree_dict[i]
             partial_labels = node.get_labels()
@@ -277,13 +254,11 @@ class Learner:  # LOLS algorithm is implemented here
                     correct_count += 1
             cost = 1-(correct_count/num_of_labels)
             node.set_cost(cost)
-            node.set_optimal_action(labels[none_index])
-        """current = 0
-        self._recurse(current, tree, labels)"""
+            node.set_optimal_action(labels[none_index])"""
+        current = 0
+        self._recurse(current, tree, labels)
 
-    def __recurse(self, state, tree, labels):
-        left = self.__recurse(tree, tree.get_left_child(), tree, labels)
-        right = self.__recurse(tree, tree.get_right_child(), tree, labels)
+    def _recurse(self, state, tree, labels):
         if tree.is_leaf(state):
             node = tree.get_node(state)
             partial_labels = node.get_labels()
@@ -291,8 +266,17 @@ class Learner:  # LOLS algorithm is implemented here
             for j in range(len(partial_labels)):
                 if partial_labels[j] == labels[j]:
                     correct_count += 1
-            cost = 1 - (correct_count / len(labels))
+            cost = 1 - (float(correct_count) / len(labels))
             node.set_cost(cost)
+            return len(labels) - correct_count
+        else:
+            node = tree.get_node(state)
+            left = self._recurse(tree.get_left_child(state), tree, labels)
+            right = self._recurse(tree.get_right_child(state), tree, labels)
+            total = float(left + right)
+            node.set_action_cost(0, left / total)
+            node.set_action_cost(1, right / total)
+            return total
 
     def _get_reference_policy(self, tree):
         tree_dict = tree.get_dictionary()
