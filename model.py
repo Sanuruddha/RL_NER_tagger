@@ -226,7 +226,6 @@ class Learner:  # LOLS algorithm is implemented here
     def _roll_out(self, policy, policy_type, state, action, induced_tree, labels):
         node = induced_tree.get_node(state)
         cost = node.get_action_cost(action)
-        print(cost)
 
         return cost
 
