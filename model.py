@@ -266,7 +266,7 @@ class Learner:  # LOLS algorithm is implemented here
         for i in tree_dict:
             node = tree_dict[i]
             partial_labels = node.get_labels()
-            correct_count = 0
+            correct_count = 0.
             num_of_labels = len(labels)
             none_index = -1
             for j in range(len(partial_labels)):
@@ -278,6 +278,21 @@ class Learner:  # LOLS algorithm is implemented here
             cost = 1-(correct_count/num_of_labels)
             node.set_cost(cost)
             node.set_optimal_action(labels[none_index])
+        """current = 0
+        self._recurse(current, tree, labels)"""
+
+    def __recurse(self, state, tree, labels):
+        left = self.__recurse(tree, tree.get_left_child(), tree, labels)
+        right = self.__recurse(tree, tree.get_right_child(), tree, labels)
+        if tree.is_leaf(state):
+            node = tree.get_node(state)
+            partial_labels = node.get_labels()
+            correct_count = 0
+            for j in range(len(partial_labels)):
+                if partial_labels[j] == labels[j]:
+                    correct_count += 1
+            cost = 1 - (correct_count / len(labels))
+            node.set_cost(cost)
 
     def _get_reference_policy(self, tree):
         tree_dict = tree.get_dictionary()
