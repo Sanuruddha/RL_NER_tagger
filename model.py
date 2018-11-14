@@ -63,15 +63,15 @@ class Learner:  # LOLS algorithm is implemented here
                 except:
                     continue
 
-        self.input = sentences
-        self.labels = labels
+        self.training_data = sentences
+        self.training_labels = labels
 
     def print_input_head(self):
         for i in self.input:
             print(i[0]),
             print(i[1])
 
-    def split_train_test(self, percentage):
+    """def split_train_test(self, percentage):
         length = len(self.input)
         train_length = (length * percentage) / 100
 
@@ -80,7 +80,35 @@ class Learner:  # LOLS algorithm is implemented here
         self.testing_data = self.input[train_length:]
         self.testing_labels = self.labels[train_length:]
         print(len(self.training_data))
-        print(len(self.testing_data))
+        print(len(self.testing_data))"""
+
+    def get_test_input(self, fname):
+        import codecs
+        sentences = [[]]
+        labels = [[]]
+        with codecs.open(fname, 'rb', encoding='utf-16', errors='ignore') as infile:
+            lines = infile.readlines()
+            EOF = False
+            count = 0
+            for line in lines:
+                try:
+                    word, label = line.split()
+                    sentences[len(sentences) - 1].append(word)
+                    if label == 'O':
+                        label = 0
+                    else:
+                        label = 1
+                    labels[len(labels) - 1].append(label)
+                    count += 1
+                    if count == 10:
+                        count = 0
+                        sentences.append([])
+                        labels.append([])
+                except:
+                    continue
+
+        self.testing_data = sentences
+        self.testing_labels = labels
 
     def learn(self, beta):
         import numpy as np

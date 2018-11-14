@@ -1,7 +1,7 @@
 import codecs
 from gensim.models import FastText
 
-with codecs.open('train.txt', 'rb', encoding='utf-16', errors='ignore') as infile:
+with codecs.open('train_test.txt', 'rb', encoding='utf-16', errors='ignore') as infile:
     fin = infile.read()
 
 lines = [[]]
