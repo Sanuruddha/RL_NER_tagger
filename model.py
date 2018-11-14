@@ -117,7 +117,7 @@ class Learner:  # LOLS algorithm is implemented here
         actions = self._actions
         for i in range(len(training_data)):
         #for i in range(100):
-            print("example " + str(i))
+            #print("example " + str(i))
             self._induced_tree = self._induce_tree(training_data[i])
             learned_policy = self._generate_learned_policy()
             reference_policy = self._generate_reference_policy(self._induced_tree, training_labels[i])
