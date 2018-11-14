@@ -144,7 +144,7 @@ class Learner:  # LOLS algorithm is implemented here
 
             experience = self._make_X_Y(experience)
 
-            self._train_classifier(experience)
+            self._train_classifier(experience, i)
 
     def _make_X_Y(self, experience):
         X = []
@@ -203,7 +203,7 @@ class Learner:  # LOLS algorithm is implemented here
         self._tf_session = tf.Session(config=tf.ConfigProto())
         self._tf_session.run(init)
 
-    def _train_classifier(self, experience):
+    def _train_classifier(self, experience, counter):
         inp = experience[0]
         inp = np.array([np.array(xi) for xi in inp])
         #inp = np.array(inp, dtype=np.float64)
@@ -214,9 +214,8 @@ class Learner:  # LOLS algorithm is implemented here
         # Run optimization op (backprop) and cost op (to get loss value)
         _, c = self._tf_session.run([self._optimizer, self._cost], feed_dict={self._x: inp,
                                                                               self._y: labels})
-        print("cost=", "{:.9f}".format(c))
-        # Display logs per epoch step
-        print("Optimization Finished!")
+        if counter % 200 == 0:
+            print("cost=", "{:.9f}".format(c))
 
     def test_classifier(self):
         X_test = self.testing_data
