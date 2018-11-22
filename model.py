@@ -118,7 +118,7 @@ class Learner:  # LOLS algorithm is implemented here
         training_labels = self.training_labels
         actions = self._actions
         for i in range(len(training_data)):
-        #for i in range(100):
+        #for i in range(2):
             #print("example " + str(i))
             self._induced_tree = self._induce_tree(training_data[i])
             learned_policy = self._generate_learned_policy()
@@ -224,6 +224,7 @@ class Learner:  # LOLS algorithm is implemented here
         Y_test = self.testing_labels
         accuracy = 0.
         for i in range(len(X_test)):
+        #for i in range(1):
             prediction = self.predict_labels(X_test[i])
             correct_count = 0.
             for j in range(len(prediction)):
@@ -234,12 +235,15 @@ class Learner:  # LOLS algorithm is implemented here
         print("testing accuracy", accuracy)
 
     def training_accuracy(self, percentage):
-        size = len(self.training_data) * (percentage/100)
+        size = (len(self.training_data) * percentage) / 100
+        print("seize", size)
         start_index = randint(0, len(self.training_data) - size - 1)
+        print("start", start_index)
         X_test = self.training_data[start_index: start_index+size]
         Y_test = self.training_labels[start_index: start_index+size]
         accuracy = 0.
         for i in range(len(X_test)):
+        #for i in range(1):
             prediction = self.predict_labels(X_test[i])
             correct_count = 0.
             for j in range(len(prediction)):
