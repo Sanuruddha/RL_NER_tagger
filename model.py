@@ -234,7 +234,7 @@ class Learner:  # LOLS algorithm is implemented here
         print("testing accuracy", accuracy)
 
     def training_accuracy(self, percentage):
-        size = self.training_data * (percentage/100)
+        size = len(self.training_data) * (percentage/100)
         start_index = randint(0, len(self.training_data) - size - 1)
         X_test = self.training_data[start_index: start_index+size]
         Y_test = self.training_labels[start_index: start_index+size]
