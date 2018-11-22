@@ -3,6 +3,8 @@ import tensorflow as tf
 from gensim.models import Word2Vec
 import numpy as np
 import os
+from random import randint
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 class Learner:  # LOLS algorithm is implemented here
@@ -229,7 +231,24 @@ class Learner:  # LOLS algorithm is implemented here
                     correct_count += 1
             accuracy += (correct_count/len(prediction))
         accuracy = accuracy/len(X_test)
-        print("accuracy", accuracy)
+        print("testing accuracy", accuracy)
+
+    def training_accuracy(self, percentage):
+        size = self.training_data * (percentage/100)
+        start_index = randint(0, len(self.training_data) - size - 1)
+        X_test = self.training_data[start_index: start_index+size]
+        Y_test = self.training_labels[start_index: start_index+size]
+        accuracy = 0.
+        for i in range(len(X_test)):
+            prediction = self.predict_labels(X_test[i])
+            correct_count = 0.
+            for j in range(len(prediction)):
+                if prediction[j] == Y_test[i][j]:
+                    correct_count += 1
+            accuracy += (correct_count / len(prediction))
+        accuracy = accuracy / len(X_test)
+        print("training accuracy", accuracy)
+
 
     def predict_labels(self, sentence):
         self._induced_tree = self._induce_tree(sentence)
