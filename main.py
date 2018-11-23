@@ -7,4 +7,4 @@ while True:
     learner.get_test_input('test.txt')
     learner.learn(0.9)
     learner.test_classifier()
-    learner.training_accuracy(10)
+    learner.training_accuracy(8)
