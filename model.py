@@ -7,14 +7,17 @@ from random import randint
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-class Learner:  # LOLS algorithm is implemented here
+
+class Learner:
     def __init__(self,
+                 embedding_model,
                  length=10,
                  learning_rate=0.001,
                  n_input=150,
                  n_classes=2,
                  n_hidden_1=10,
                  n_hidden_2=10):
+        self._embedding_model = embedding_model
         self._x = None
         self._y = None
         self._induced_tree = None
@@ -40,6 +43,17 @@ class Learner:  # LOLS algorithm is implemented here
         self._actions = {'NNE': 0, 'NE': 1}
         self._init_classifier()
 
+    """input has to be in the format word followed by the label 
+       word1 label1                           (label 'O' is considered as None names NNE)
+       word2 label2 
+       word3 label3  
+    """
+    """this will create a 2 lists of lists where list 1 contains word lists, 
+       and list 2 contains corresponding label lists.
+        
+       list 1 = [[word1, word2 ....], [], []]
+       list 2 = [[label1, label2 ....],[],[]]
+    """
     def get_input(self, fname):
         import codecs
         sentences = [[]]
@@ -53,9 +67,9 @@ class Learner:  # LOLS algorithm is implemented here
                     word, label = line.split()
                     sentences[len(sentences) - 1].append(word)
                     if label == 'O':
-                        label = 0
+                        label = self._actions['NNE']
                     else:
-                        label = 1
+                        label = self._actions['NE']
                     labels[len(labels) - 1].append(label)
                     count += 1
                     if count == 10:
@@ -73,17 +87,17 @@ class Learner:  # LOLS algorithm is implemented here
             print(i[0]),
             print(i[1])
 
-    """def split_train_test(self, percentage):
-        length = len(self.input)
-        train_length = (length * percentage) / 100
+    """input has to be in the format word followed by the label 
+           word1 label1                           (label 'O' is considered as None names NNE)
+           word2 label2 
+           word3 label3  
+        """
+    """this will create a 2 lists of lists where list 1 contains word lists, 
+       and list 2 contains corresponding label lists.
 
-        self.training_data = self.input[:train_length]
-        self.training_labels = self.labels[:train_length]
-        self.testing_data = self.input[train_length:]
-        self.testing_labels = self.labels[train_length:]
-        print(len(self.training_data))
-        print(len(self.testing_data))"""
-
+       list 1 = [[word1, word2 ....], [], []]
+       list 2 = [[label1, label2 ....],[],[]]
+    """
     def get_test_input(self, fname):
         import codecs
         sentences = [[]]
@@ -97,9 +111,9 @@ class Learner:  # LOLS algorithm is implemented here
                     word, label = line.split()
                     sentences[len(sentences) - 1].append(word)
                     if label == 'O':
-                        label = 0
+                        label = self._actions['NNE']
                     else:
-                        label = 1
+                        label = self._actions['NE']
                     labels[len(labels) - 1].append(label)
                     count += 1
                     if count == 10:
@@ -112,6 +126,9 @@ class Learner:  # LOLS algorithm is implemented here
         self.testing_data = sentences
         self.testing_labels = labels
 
+    """Learning algorithm
+       Iterates over all the sentences and collect 10 cost sensitive examples for each sentence
+    """
     def learn(self, beta):
         import numpy as np
         training_data = self.training_data
@@ -359,7 +376,7 @@ class Learner:  # LOLS algorithm is implemented here
 
     def _generate_feature_vector(self, state):
 
-        word2vec_model = Word2Vec.load("word2vec.model")
+        word2vec_model = Word2Vec.load(self._embedding_model)
         partial_labels = self._induced_tree.get_node(state).get_labels()
         sentence = self._induced_tree.get_node(state).get_sentence()
         word_index = -1
