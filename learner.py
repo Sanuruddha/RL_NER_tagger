@@ -9,12 +9,14 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 class Learner:  # LOLS algorithm is implemented here
     def __init__(self,
+                 vw_model,
                  length=10,
                  learning_rate=0.001,
                  n_input=150,
                  n_classes=2,
                  n_hidden_1=10,
                  n_hidden_2=10):
+        self._model = vw_model
         self._x = None
         self._y = None
         self._induced_tree = None
@@ -117,8 +119,8 @@ class Learner:  # LOLS algorithm is implemented here
         training_data = self.training_data
         training_labels = self.training_labels
         actions = self._actions
-        for i in range(len(training_data)):
-        #for i in range(2):
+        #for i in range(len(training_data)):
+        for i in range(2):
             #print("example " + str(i))
             self._induced_tree = self._induce_tree(training_data[i])
             learned_policy = self._generate_learned_policy()
@@ -224,8 +226,8 @@ class Learner:  # LOLS algorithm is implemented here
         print("test size", len(X_test))
         Y_test = self.testing_labels
         accuracy = 0.
-        for i in range(len(X_test)):
-        #for i in range(1):
+        #for i in range(len(X_test)):
+        for i in range(1):
             prediction = self.predict_labels(X_test[i])
             correct_count = 0.
             for j in range(len(prediction)):
@@ -359,7 +361,7 @@ class Learner:  # LOLS algorithm is implemented here
 
     def _generate_feature_vector(self, state):
 
-        word2vec_model = Word2Vec.load("word2vec.model")
+        word2vec_model = Word2Vec.load(self._model)
         partial_labels = self._induced_tree.get_node(state).get_labels()
         sentence = self._induced_tree.get_node(state).get_sentence()
         word_index = -1
