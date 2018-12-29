@@ -3,7 +3,7 @@ import tensorflow as tf
 from gensim.models import Word2Vec
 import numpy as np
 import os
-from random import randint
+import random
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -40,6 +40,7 @@ class Learner:  # LOLS algorithm is implemented here
         self._optimizer = None
         self._prediction = None
         self._actions = {'NNE': 0, 'NE': 1}
+        self._experiences = []
         self._init_classifier()
 
     def get_input(self, fname):
@@ -119,8 +120,8 @@ class Learner:  # LOLS algorithm is implemented here
         training_data = self.training_data
         training_labels = self.training_labels
         actions = self._actions
-        #for i in range(len(training_data)):
-        for i in range(2):
+        for i in range(len(training_data)):
+        #for i in range(2):
             #print("example " + str(i))
             self._induced_tree = self._induce_tree(training_data[i])
             learned_policy = self._generate_learned_policy()
@@ -145,10 +146,21 @@ class Learner:  # LOLS algorithm is implemented here
                 experience.append([feature_vector, costs])
                 s = learned_policy[s]
 
+            self._experiences += experience
+            if len(self._experiences) < 40:
+                sample = self._make_X_Y(self._experiences)
+            else:
+                sample = self._sample(self._experiences)
+            self._train_classifier(sample, i)
 
-            experience = self._make_X_Y(experience)
-
-            self._train_classifier(experience, i)
+    def _sample(self, experiences):
+        X = []
+        Y = []
+        sample = random.sample(experiences, 40)
+        for i in range(len(sample)):
+            X.append(sample[i][0])
+            Y.append(sample[i][1])
+        return [X, Y]
 
     def _make_X_Y(self, experience):
         X = []
@@ -226,8 +238,8 @@ class Learner:  # LOLS algorithm is implemented here
         print("test size", len(X_test))
         Y_test = self.testing_labels
         accuracy = 0.
-        #for i in range(len(X_test)):
-        for i in range(1):
+        for i in range(len(X_test)):
+        #for i in range(1):
             prediction = self.predict_labels(X_test[i])
             correct_count = 0.
             for j in range(len(prediction)):
@@ -240,7 +252,7 @@ class Learner:  # LOLS algorithm is implemented here
     def training_accuracy(self, percentage):
         size = (len(self.training_data) * percentage) / 100
         print("train size", size)
-        start_index = randint(0, len(self.training_data) - size - 1)
+        start_index = random.randint(0, len(self.training_data) - size - 1)
         print("start", start_index)
         X_test = self.training_data[start_index: start_index+size]
         Y_test = self.training_labels[start_index: start_index+size]
