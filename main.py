@@ -9,22 +9,47 @@ sets = {0: 100, 1: 250, 2: 500, 3: 1000, 4: 2000, 5: 3000, 6: 4000,  7: 5000, 8:
 
 train_set = pre_proc.get_input('train.txt')
 test_set = pre_proc.get_input('test.txt')
-for i in range(10):
-    test_results = []
-    train_results = []
+for i in range(1):
+    test_accuracies = []
+    train_accuracies = []
+    test_precisions = []
+    train_precisions = []
+    test_recalls = []
+    train_recalls = []
     f_test = open(str(sets[i])+'test', 'w')
     f_train = open(str(sets[i])+'train', 'w')
     split_train_set = [train_set[0][:sets[i]], train_set[1][:sets[i]]]
     for j in range(10):
         learner = Learner('word2vec.model', split_train_set, test_set)
         learner.learn(0.9)
-        testing_acc = learner.test_classifier()
-        training_acc = learner.training_accuracy(8)
-        test_results.append(str(testing_acc * 100))
-        train_results.append(str(training_acc * 100))
-    for k in range(len(test_results)):
-        f_test.write(test_results[k] + " ")
-        f_train.write(train_results[k] + " ")
+        test_results = learner.test_classifier()
+        train_results = learner.training_accuracy(8)
+        test_accuracy = test_results[0]
+        train_accuracy = train_results[0]
+        test_precision = test_results[1]
+        train_precision = train_results[1]
+        test_recall = test_results[2]
+        train_recall = train_results[2]
+
+        test_accuracies.append(str(test_accuracy * 100))
+        train_accuracies.append(str(train_accuracy * 100))
+        test_precisions.append(str(test_precision * 100))
+        train_precisions.append(str(train_precision * 100))
+        test_recalls.append(str(test_recall * 100))
+        train_recalls.append(str(train_recall * 100))
+    for k in range(len(test_accuracies)):
+        f_test.write(test_accuracies[k] + " ")
+        f_train.write(train_accuracies[k] + " ")
+    f_test.write("\n")
+    f_train.write("\n ")
+    for k in range(len(test_precisions)):
+        f_test.write(test_precisions[k] + " ")
+        f_train.write(train_precisions[k] + " ")
+    f_test.write("\n")
+    f_train.write("\n ")
+    for k in range(len(test_recalls)):
+        f_test.write(test_recalls[k] + " ")
+        f_train.write(train_recalls[k] + " ")
     f_test.close()
     f_train.close()
 

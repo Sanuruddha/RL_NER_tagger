@@ -44,8 +44,6 @@ class Learner:  # LOLS algorithm is implemented here
         self._actions = {'NNE': 0, 'NE': 1}
         self._experiences = []
         self._init_classifier()
-
-
     def learn(self, beta):
         import numpy as np
         training_data = self.training_data
@@ -166,17 +164,36 @@ class Learner:  # LOLS algorithm is implemented here
         X_test = self.testing_data
         print("test size", len(X_test))
         Y_test = self.testing_labels
-        accuracy = 0.
+        positives = 0.
+        negatives = 0.
+        correct_positives = 0.
+        correct_negatives = 0.
         for i in range(len(X_test)):
         #for i in range(1):
             prediction = self.predict_labels(X_test[i])
-            correct_count = 0.
             for j in range(len(prediction)):
+                if Y_test[i][j] == self._actions['NE']:
+                    positives += 1
+                else:
+                    negatives += 1
                 if prediction[j] == Y_test[i][j]:
-                    correct_count += 1
-            accuracy += (correct_count/len(prediction))
-        accuracy = accuracy/len(X_test)
-        return accuracy
+                    if prediction[j] == self._actions['NE']:
+                        correct_positives += 1
+                    else:
+                        correct_negatives += 1
+        try:
+            accuracy = (correct_positives + correct_negatives) / (positives + negatives)
+        except ZeroDivisionError:
+            accuracy = 0
+        try:
+            precision = correct_positives / (correct_positives + (negatives - correct_negatives))
+        except ZeroDivisionError:
+            precision = 0
+        try:
+            recall = correct_positives / positives
+        except ZeroDivisionError:
+            recall = 0
+        return [accuracy, precision, recall]
 
     def training_accuracy(self, percentage):
         size = (len(self.training_data) * percentage) / 100
@@ -185,17 +202,36 @@ class Learner:  # LOLS algorithm is implemented here
         print("start", start_index)
         X_test = self.training_data[start_index: start_index+size]
         Y_test = self.training_labels[start_index: start_index+size]
-        accuracy = 0.
+        positives = 0.
+        negatives = 0.
+        correct_positives = 0.
+        correct_negatives = 0.
         for i in range(len(X_test)):
         #for i in range(1):
             prediction = self.predict_labels(X_test[i])
-            correct_count = 0.
             for j in range(len(prediction)):
+                if Y_test[i][j] == self._actions['NE']:
+                    positives += 1
+                else:
+                    negatives += 1
                 if prediction[j] == Y_test[i][j]:
-                    correct_count += 1
-            accuracy += (correct_count / len(prediction))
-        accuracy = accuracy / len(X_test)
-        return accuracy
+                    if prediction[j] == self._actions['NE']:
+                        correct_positives += 1
+                    else:
+                        correct_negatives += 1
+        try:
+            accuracy = (correct_positives + correct_negatives) / (positives + negatives)
+        except ZeroDivisionError:
+            accuracy = 0
+        try:
+            precision = correct_positives / (correct_positives + (negatives - correct_negatives))
+        except ZeroDivisionError:
+            precision = 0
+        try:
+            recall = correct_positives / positives
+        except ZeroDivisionError:
+            recall = 0
+        return [accuracy, precision, recall]
 
     def predict_labels(self, sentence):
         self._induced_tree = self._induce_tree(sentence)

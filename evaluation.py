@@ -1,7 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-sets = {0: 100, 1: 250, 2: 500, 3: 1000, 4: 2000, 5: 3000, 6: 4000,  7: 5000, 8: 6000, 9: 7452}
+sets = {0: 100,
+        # 1: 250,
+        # 2: 500,
+        # 3: 1000,
+        # 4: 2000,
+        # 5: 3000,
+        # 6: 4000,
+        # 7: 5000,
+        # 8: 6000,
+        # 9: 7452
+        }
 test_results = {}
 train_results = {}
 for i in sets:
@@ -23,13 +33,15 @@ ax1 = fig.add_subplot(111)
 print(len(test_results), len(train_results))
 j = 0
 for i in test_results:
-    ax1.scatter([k+1 for k in range(len(test_results[i]))], test_results[i],  s=10, c=colorArray[j], marker="s", label=str(i))
-    ax1.plot([k+1 for k in range(len(test_results[i]))], test_results[i])
+    print([k+1 for k in range(len(test_results[i]))])
+    print(test_results[i])
+    ax1.scatter([k+1 for k in range(len(test_results[i]))], [float(l) for l in test_results[i]],  s=10, c=colorArray[j], marker="s", label=str(i))
+    ax1.plot([k+1 for k in range(len(test_results[i]))], [float(l) for l in test_results[i]])
     # ax1.scatter([k for k in range(10)], train_results[i], s=10, c=colorArray[j], marker="o", label='train')
     # ax1.plot([k for k in range(10)], train_results[i])
     plt.setp(ax1.get_xticklabels(), visible=True)
-    plt.yticks(np.arange(0, 100, 5))
     plt.xticks(np.arange(1, 11, 1))
+    plt.yticks(np.arange(0, 105, 5))
     j += 1
 
 
