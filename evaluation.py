@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 sets = {0: 100,
-        # 1: 250,
+        1: 250,
         # 2: 500,
         # 3: 1000,
         # 4: 2000,
