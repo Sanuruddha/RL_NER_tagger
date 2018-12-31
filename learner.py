@@ -153,10 +153,8 @@ class Learner:  # LOLS algorithm is implemented here
     def _train_classifier(self, experience, counter):
         inp = experience[0]
         inp = np.array([np.array(xi) for xi in inp])
-        #inp = np.array(inp, dtype=np.float64)
         labels = experience[1]
         labels = np.array([np.array(xi) for xi in labels])
-        #labels = np.array(labels, dtype=np.float64)
 
         # Run optimization op (backprop) and cost op (to get loss value)
         _, c = self._tf_session.run([self._optimizer, self._cost], feed_dict={self._x: inp,
@@ -233,22 +231,6 @@ class Learner:  # LOLS algorithm is implemented here
         return policy
 
     def _generate_node_costs(self, tree, labels):
-        """tree_dict = tree.get_dictionary()
-        for i in tree_dict:
-            node = tree_dict[i]
-            partial_labels = node.get_labels()
-            correct_count = 0.
-            num_of_labels = len(labels)
-            none_index = -1
-            for j in range(len(partial_labels)):
-                if partial_labels[j] is None:
-                    none_index = j
-                    break
-                elif partial_labels[j] == labels[j]:
-                    correct_count += 1
-            cost = 1-(correct_count/num_of_labels)
-            node.set_cost(cost)
-            node.set_optimal_action(labels[none_index])"""
         current = 0
         self._recurse(current, tree, labels)
 
