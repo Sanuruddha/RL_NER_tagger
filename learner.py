@@ -10,6 +10,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 class Learner:  # LOLS algorithm is implemented here
     def __init__(self,
                  vw_model,
+                 training_set,
+                 testing_set,
                  length=10,
                  learning_rate=0.001,
                  n_input=150,
@@ -22,10 +24,10 @@ class Learner:  # LOLS algorithm is implemented here
         self._induced_tree = None
         self.input = []
         self.labels = []
-        self.training_data = []
-        self.training_labels = []
-        self.testing_data = []
-        self.testing_labels = []
+        self.training_data = training_set[0]
+        self.training_labels = training_set[1]
+        self.testing_data = testing_set[0]
+        self.testing_labels = testing_set[1]
         self.classifier = None
         self.sentence_length = length
         self._weights_biases ={}
@@ -43,77 +45,6 @@ class Learner:  # LOLS algorithm is implemented here
         self._experiences = []
         self._init_classifier()
 
-    def get_input(self, fname):
-        import codecs
-        sentences = [[]]
-        labels = [[]]
-        with codecs.open(fname, 'rb', encoding='utf-16', errors='ignore') as infile:
-            lines = infile.readlines()
-            EOF = False
-            count = 0
-            for line in lines:
-                try:
-                    word, label = line.split()
-                    sentences[len(sentences) - 1].append(word)
-                    if label == 'O':
-                        label = 0
-                    else:
-                        label = 1
-                    labels[len(labels) - 1].append(label)
-                    count += 1
-                    if count == 10:
-                        count = 0
-                        sentences.append([])
-                        labels.append([])
-                except:
-                    continue
-
-        self.training_data = sentences
-        self.training_labels = labels
-
-    def print_input_head(self):
-        for i in self.input:
-            print(i[0]),
-            print(i[1])
-
-    """def split_train_test(self, percentage):
-        length = len(self.input)
-        train_length = (length * percentage) / 100
-
-        self.training_data = self.input[:train_length]
-        self.training_labels = self.labels[:train_length]
-        self.testing_data = self.input[train_length:]
-        self.testing_labels = self.labels[train_length:]
-        print(len(self.training_data))
-        print(len(self.testing_data))"""
-
-    def get_test_input(self, fname):
-        import codecs
-        sentences = [[]]
-        labels = [[]]
-        with codecs.open(fname, 'rb', encoding='utf-16', errors='ignore') as infile:
-            lines = infile.readlines()
-            EOF = False
-            count = 0
-            for line in lines:
-                try:
-                    word, label = line.split()
-                    sentences[len(sentences) - 1].append(word)
-                    if label == 'O':
-                        label = 0
-                    else:
-                        label = 1
-                    labels[len(labels) - 1].append(label)
-                    count += 1
-                    if count == 10:
-                        count = 0
-                        sentences.append([])
-                        labels.append([])
-                except:
-                    continue
-
-        self.testing_data = sentences
-        self.testing_labels = labels
 
     def learn(self, beta):
         import numpy as np
@@ -247,7 +178,7 @@ class Learner:  # LOLS algorithm is implemented here
                     correct_count += 1
             accuracy += (correct_count/len(prediction))
         accuracy = accuracy/len(X_test)
-        print("testing accuracy", accuracy)
+        return accuracy
 
     def training_accuracy(self, percentage):
         size = (len(self.training_data) * percentage) / 100
@@ -266,8 +197,7 @@ class Learner:  # LOLS algorithm is implemented here
                     correct_count += 1
             accuracy += (correct_count / len(prediction))
         accuracy = accuracy / len(X_test)
-        print("training accuracy", accuracy)
-
+        return accuracy
 
     def predict_labels(self, sentence):
         self._induced_tree = self._induce_tree(sentence)
