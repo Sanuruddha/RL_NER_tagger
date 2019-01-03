@@ -14,7 +14,7 @@ class Learner:  # LOLS algorithm is implemented here
                  testing_set,
                  length=10,
                  learning_rate=0.001,
-                 n_input=150,
+                 n_input=60,
                  n_classes=2,
                  n_hidden_1=10,
                  n_hidden_2=10):
@@ -75,17 +75,19 @@ class Learner:  # LOLS algorithm is implemented here
                 experience.append([feature_vector, costs])
                 s = learned_policy[s]
 
-            self._experiences += experience
-            if len(self._experiences) < 40:
-                sample = self._make_X_Y(self._experiences)
-            else:
-                sample = self._sample(self._experiences)
+            # self._experiences += experience
+            # if len(self._experiences) < 40:
+            #     sample = self._make_X_Y(self._experiences)
+            # else:
+            #     sample = self._sample(self._experiences)
+            sample = self._make_X_Y(experience)
             self._train_classifier(sample, i)
 
     def _sample(self, experiences):
+        start = random.randint(0, len(experiences) - 2)
         X = []
         Y = []
-        sample = random.sample(experiences, 40)
+        sample = experiences[start: start + 40]
         for i in range(len(sample)):
             X.append(sample[i][0])
             Y.append(sample[i][1])
@@ -157,19 +159,19 @@ class Learner:  # LOLS algorithm is implemented here
         # Run optimization op (backprop) and cost op (to get loss value)
         _, c = self._tf_session.run([self._optimizer, self._cost], feed_dict={self._x: inp,
                                                                               self._y: labels})
-        if counter % 200 == 0:
-            print("cost=", "{:.9f}".format(c))
+        #if counter % 200 == 0:
+            #print("cost=", "{:.9f}".format(c))
 
     def test_classifier(self):
         X_test = self.testing_data
-        print("test size", len(X_test))
+        #print("test size", len(X_test))
         Y_test = self.testing_labels
         positives = 0.
         negatives = 0.
         correct_positives = 0.
         correct_negatives = 0.
         for i in range(len(X_test)):
-        #for i in range(1):
+        #for i in range(20):
             prediction = self.predict_labels(X_test[i])
             for j in range(len(prediction)):
                 if Y_test[i][j] == self._actions['NE']:
@@ -181,6 +183,7 @@ class Learner:  # LOLS algorithm is implemented here
                         correct_positives += 1
                     else:
                         correct_negatives += 1
+        print([correct_positives, correct_negatives, positives, negatives])
         try:
             accuracy = (correct_positives + correct_negatives) / (positives + negatives)
         except ZeroDivisionError:
@@ -193,13 +196,14 @@ class Learner:  # LOLS algorithm is implemented here
             recall = correct_positives / positives
         except ZeroDivisionError:
             recall = 0
+        print([accuracy, precision, recall])
         return [accuracy, precision, recall]
 
-    def training_accuracy(self, percentage):
-        size = (len(self.training_data) * percentage) / 100
-        print("train size", size)
+    def training_accuracy(self, size):
+        size = size
+        #print("train size", size)
         start_index = random.randint(0, len(self.training_data) - size - 1)
-        print("start", start_index)
+        #print("start", start_index)
         X_test = self.training_data[start_index: start_index+size]
         Y_test = self.training_labels[start_index: start_index+size]
         positives = 0.
@@ -207,7 +211,7 @@ class Learner:  # LOLS algorithm is implemented here
         correct_positives = 0.
         correct_negatives = 0.
         for i in range(len(X_test)):
-        #for i in range(1):
+        #for i in range(10):
             prediction = self.predict_labels(X_test[i])
             for j in range(len(prediction)):
                 if Y_test[i][j] == self._actions['NE']:
@@ -275,12 +279,20 @@ class Learner:  # LOLS algorithm is implemented here
             node = tree.get_node(state)
             partial_labels = node.get_labels()
             correct_count = 0
+            total_count = 0
             for j in range(len(partial_labels)):
+                if labels[j] == self._actions["NE"]:
+                    total_count += 10
+                else:
+                    total_count += 1
                 if partial_labels[j] == labels[j]:
-                    correct_count += 1
-            cost = 1 - (float(correct_count) / len(labels))
+                    if labels[j] == self._actions["NE"]:
+                        correct_count += 10
+                    else:
+                        correct_count += 1
+            cost = 1 - (float(correct_count) / total_count)
             node.set_cost(cost)
-            return len(labels) - correct_count
+            return total_count - correct_count
         else:
             node = tree.get_node(state)
             left = self._recurse(tree.get_left_child(state), tree, labels)
@@ -329,8 +341,8 @@ class Learner:  # LOLS algorithm is implemented here
             if partial_labels[i] is None:
                 word_index = i
                 break
-        previous_word_vector = [0. for i in range(50)]
-        next_word_vector = [0. for i in range(50)]
+        previous_word_vector = [0. for i in range(self._n_input/3)]
+        next_word_vector = [0. for i in range(self._n_input/3)]
         if word_index > 1:
             previous_word = sentence[word_index-1]
             previous_word_vector = self._get_word_embedding(word2vec_model.wv, previous_word)
@@ -350,4 +362,4 @@ class Learner:  # LOLS algorithm is implemented here
         try:
             return model[word]
         except:
-            return [0. for i in range(50)]
+            return [0. for i in range(self._n_input/3)]

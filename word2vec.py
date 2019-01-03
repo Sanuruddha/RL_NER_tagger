@@ -28,5 +28,5 @@ class Word2VecBuilder:
         #f = codecs.open("out.txt", "w+", encoding='utf-8')
         #for i in lines:
             #f.write("%s\n" % (' '.join(i)))
-        model_ted = FastText(lines, size=50, window=5, min_count=5, workers=4, sg=1)
+        model_ted = FastText(lines, size=size, window=window, min_count=min_count, workers=workers, sg=sg)
         model_ted.save(outputfile)
