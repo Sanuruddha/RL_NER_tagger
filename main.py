@@ -2,14 +2,14 @@ from learner import Learner
 from word2vec import Word2VecBuilder
 from preprocessor import Preprocessor
 
-w2v = Word2VecBuilder('train_test.txt', 'word2vec.model', 30, 5, 5, 4, 1)
+w2v = Word2VecBuilder('train_test.txt', 'word2vec.model', 7, 3, 1, 4, 1)
 pre_proc = Preprocessor()
 
 sets = {0: 100, 1: 250, 2: 500, 3: 1000, 4: 2000, 5: 3000, 6: 4000,  7: 5000, 8: 6000, 9: 7452}
 
 train_set = pre_proc.get_input('train.txt')
 test_set = pre_proc.get_input('test.txt')
-for i in range(5, 6):
+for i in range(9, 10):
     test_accuracies = []
     train_accuracies = []
     test_precisions = []
@@ -20,7 +20,7 @@ for i in range(5, 6):
     f_train = open(str(sets[i])+'train', 'w')
     split_train_set = [train_set[0][:sets[i]], train_set[1][:sets[i]]]
     for j in range(1):
-        learner = Learner('word2vec.model', split_train_set, test_set, 10, 0.0001, 90, 2, 10, 10)
+        learner = Learner('word2vec.model', split_train_set, test_set, 10, 0.01, 21, 2, 6, 10)
         learner.learn(1)
         test_results = learner.test_classifier()
         train_results = learner.training_accuracy(80)

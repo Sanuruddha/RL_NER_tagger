@@ -107,10 +107,12 @@ class Learner:  # LOLS algorithm is implemented here
         layer_1 = tf.add(tf.matmul(self._x, weights['h1']), biases['b1'])
         layer_1 = tf.nn.relu(layer_1)
         # Hidden layer with RELU activation
-        layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
-        layer_2 = tf.nn.relu(layer_2)
-        # Output layer with linear activation
-        out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+        # layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
+        # layer_2 = tf.nn.relu(layer_2)
+        # # Output layer with linear activation
+        # out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+
+        out_layer = tf.matmul(layer_1, weights['out']) + biases['out']
         return out_layer
 
     def _init_classifier(self):
@@ -120,15 +122,25 @@ class Learner:  # LOLS algorithm is implemented here
         self._y = tf.placeholder("float", [None, self._n_classes])
 
         # Store layers weight & bias
+        # weights = {
+        #     'h1': tf.Variable(tf.random_normal([self._n_input, self._n_hidden_1])),
+        #     'h2': tf.Variable(tf.random_normal([self._n_hidden_1, self._n_hidden_2])),
+        #     'out': tf.Variable(tf.random_normal([self._n_hidden_2, self._n_classes]))
+        # }
+        #
+        # biases = {
+        #     'b1': tf.Variable(tf.random_normal([self._n_hidden_1])),
+        #     'b2': tf.Variable(tf.random_normal([self._n_hidden_2])),
+        #     'out': tf.Variable(tf.random_normal([self._n_classes]))
+        # }
+
         weights = {
             'h1': tf.Variable(tf.random_normal([self._n_input, self._n_hidden_1])),
-            'h2': tf.Variable(tf.random_normal([self._n_hidden_1, self._n_hidden_2])),
-            'out': tf.Variable(tf.random_normal([self._n_hidden_2, self._n_classes]))
+            'out': tf.Variable(tf.random_normal([self._n_hidden_1, self._n_classes]))
         }
 
         biases = {
             'b1': tf.Variable(tf.random_normal([self._n_hidden_1])),
-            'b2': tf.Variable(tf.random_normal([self._n_hidden_2])),
             'out': tf.Variable(tf.random_normal([self._n_classes]))
         }
 
