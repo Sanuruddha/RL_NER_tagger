@@ -9,7 +9,7 @@ sets = {0: 100, 1: 250, 2: 500, 3: 1000, 4: 2000, 5: 3000, 6: 4000,  7: 5000, 8:
 
 train_set = pre_proc.get_input('train.txt')
 test_set = pre_proc.get_input('test.txt')
-for i in range(9, 10):
+for i in range(4, 10):
     test_accuracies = []
     train_accuracies = []
     test_precisions = []
@@ -20,10 +20,10 @@ for i in range(9, 10):
     f_train = open(str(sets[i])+'train', 'w')
     split_train_set = [train_set[0][:sets[i]], train_set[1][:sets[i]]]
     for j in range(1):
-        learner = Learner('word2vec.model', split_train_set, test_set, 10, 0.01, 21, 2, 6, 10)
+        learner = Learner('word2vec.model', split_train_set, test_set, 10, 0.001, 21, 2, 6, 10)
         learner.learn(1)
         test_results = learner.test_classifier()
-        train_results = learner.training_accuracy(80)
+        train_results = learner.training_accuracy(sets[i]-10)
         test_accuracy = test_results[0]
         train_accuracy = train_results[0]
         test_precision = test_results[1]
