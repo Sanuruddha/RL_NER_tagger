@@ -294,12 +294,12 @@ class Learner:  # LOLS algorithm is implemented here
             total_count = 0
             for j in range(len(partial_labels)):
                 if labels[j] == self._actions["NE"]:
-                    total_count += 1
+                    total_count += 1000
                 else:
                     total_count += 1
                 if partial_labels[j] == labels[j]:
                     if labels[j] == self._actions["NE"]:
-                        correct_count += 1
+                        correct_count += 1000
                     else:
                         correct_count += 1
             cost = 1 - (float(correct_count) / total_count)
